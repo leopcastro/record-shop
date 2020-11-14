@@ -1,8 +1,10 @@
 FROM php:7.4-fpm-alpine AS PROD
 
+WORKDIR /var/www/record-shop
+
 COPY ./app /var/www/record-shop
 
-WORKDIR /var/www/record-shop
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 FROM prod AS DEV
 
