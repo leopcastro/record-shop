@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  rs-nginx:
+    image: private/record-shop/nginx:latest
+    build:
+      dockerfile: docker/nginx/Dockerfile
+      context: ../.
+    ports:
+      - 8080:80
+    volumes:
+      - ../app/public:/var/www/record-shop/public:delegated
+      - ./nginx/record-shop.conf:/etc/nginx/conf.d/default.conf:delegated
+    depends_on:
+      - rs-php
+
+  rs-php:
+    image: private/record-shop/php-fpm-dev:latest
+    build:
+      dockerfile: docker/php-fpm/Dockerfile
+      context: ../.
+      target: DEV
+    environment:
+      - PHP_IDE_CONFIG=serverName=rs-php
+    volumes:
+      - ../app:/var/www/record-shop:delegated
+      - ./php-fpm/dev.xdebug.ini:/usr/local/etc/php/conf.d/dev.xdebug.ini:delegated
