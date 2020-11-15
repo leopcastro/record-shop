@@ -29,3 +29,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Fix for incompatibility between FrameworkExtraBundle > 4 and FOSRestBundle
+    # https://github.com/FriendsOfSymfony/FOSRestBundle/issues/1768#issuecomment-340294485
+    sensio_framework_extra.view.listener:
+        alias: Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener
