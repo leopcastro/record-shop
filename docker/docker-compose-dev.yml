@@ -24,3 +24,12 @@ services:
     volumes:
       - ../app:/var/www/record-shop:delegated
       - ./php-fpm/dev.xdebug.ini:/usr/local/etc/php/conf.d/dev.xdebug.ini:delegated
+    depends_on:
+      - rs-mysql
+
+  rs-mysql:
+    image: mysql:5.7
+    ports:
+      - 3310:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
