@@ -1,0 +1,9 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Record Store
+            description: Prototype API for Website
+            version: 1.0.0
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$|/doc.json$) # Accepts routes under /api except /api/doc or /api/doc.json

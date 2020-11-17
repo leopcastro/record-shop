@@ -1,5 +1,7 @@
 FROM php:7.4-fpm-alpine AS PROD
 
+RUN docker-php-ext-install pdo_mysql && docker-php-ext-enable pdo_mysql
+
 WORKDIR /var/www/record-shop
 
 COPY ./app /var/www/record-shop
