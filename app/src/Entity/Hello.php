@@ -48,6 +48,4 @@ class Hello
     {
         $this->message = $message;
     }
-
-
 }

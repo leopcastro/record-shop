@@ -9,3 +9,7 @@ public/bundles/
 var/
 vendor/
 ###< symfony/framework-bundle ###
+
+###> squizlabs/php_codesniffer ###
+.phpcs-cache
+###< squizlabs/php_codesniffer ###

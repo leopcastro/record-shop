@@ -73,5 +73,8 @@
             "allow-contrib": false,
             "require": "5.1.*"
         }
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.5"
     }
 }
