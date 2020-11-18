@@ -23,6 +23,9 @@
     "doctrine/common": {
         "version": "3.0.2"
     },
+    "doctrine/data-fixtures": {
+        "version": "1.4.4"
+    },
     "doctrine/dbal": {
         "version": "2.12.1"
     },
@@ -39,6 +42,18 @@
             "config/packages/prod/doctrine.yaml",
             "src/Entity/.gitignore",
             "src/Repository/.gitignore"
+        ]
+    },
+    "doctrine/doctrine-fixtures-bundle": {
+        "version": "3.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "e5b542d4ef47d8a003c91beb35650c76907f7e53"
+        },
+        "files": [
+            "src/DataFixtures/AppFixtures.php"
         ]
     },
     "doctrine/doctrine-migrations-bundle": {
@@ -99,6 +114,9 @@
     "laminas/laminas-zendframework-bridge": {
         "version": "1.1.1"
     },
+    "liip/test-fixtures-bundle": {
+        "version": "1.10.0"
+    },
     "nelmio/api-doc-bundle": {
         "version": "3.0",
         "recipe": {
@@ -148,7 +166,22 @@
             "config/packages/sensio_framework_extra.yaml"
         ]
     },
+    "squizlabs/php_codesniffer": {
+        "version": "3.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "0dc9cceda799fd3a08b96987e176a261028a3709"
+        },
+        "files": [
+            "phpcs.xml.dist"
+        ]
+    },
     "symfony/asset": {
+        "version": "v5.1.8"
+    },
+    "symfony/browser-kit": {
         "version": "v5.1.8"
     },
     "symfony/cache": {
@@ -179,6 +212,9 @@
         "version": "v2.2.0"
     },
     "symfony/doctrine-bridge": {
+        "version": "v5.1.8"
+    },
+    "symfony/dom-crawler": {
         "version": "v5.1.8"
     },
     "symfony/dotenv": {
@@ -245,6 +281,21 @@
     },
     "symfony/orm-pack": {
         "version": "v2.0.0"
+    },
+    "symfony/phpunit-bridge": {
+        "version": "4.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.3",
+            "ref": "6d0e35f749d5f4bfe1f011762875275cd3f9874f"
+        },
+        "files": [
+            ".env.test",
+            "bin/phpunit",
+            "phpunit.xml.dist",
+            "tests/bootstrap.php"
+        ]
     },
     "symfony/polyfill-intl-grapheme": {
         "version": "v1.20.0"
