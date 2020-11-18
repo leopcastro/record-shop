@@ -20,7 +20,7 @@ use OpenApi\Annotations as OA;
 class HelloController extends AbstractFOSRestController
 {
     /**
-     * @Rest\Get("/")
+     * @Rest\Get("")
      * @OA\Response(
      *     response=200,
      *     description="List of Hello messages",
