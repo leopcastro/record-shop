@@ -2,52 +2,57 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Controller;
+namespace App\Tests\Functional;
 
 use App\DataFixtures\RecordFixtures;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class RecordControllerTest extends WebTestCase
 {
     use FixturesTrait;
 
-    public function testGetRecords()
-    {
-        $client = static::createClient();
+    private KernelBrowser $client;
 
+    protected function setUp()
+    {
+        $this->client = static::createClient();
+    }
+
+    public function testList()
+    {
         $referenceRepository = $this->loadFixtures([RecordFixtures::class])->getReferenceRepository();
 
-        $client->request('GET', '/api/record');
+        $this->client->request('GET', '/api/records');
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
 
         $this->assertEquals(200, $response->getStatusCode());
 
         $serializer = self::$container->get('serializer');
 
-        $expectedResponse = $serializer->serialize(
-            [
+        $recordsList = [
+            'records' => [
                 $referenceRepository->getReference(RecordFixtures::APPETITE_REFERENCE),
                 $referenceRepository->getReference(RecordFixtures::DARK_SIDE_NO_RELEASE_REFERENCE)
-            ],
-            'json'
-        );
+            ]
+        ];
+
+        $expectedResponse = $serializer->serialize($recordsList, 'json');
 
         $this->assertEquals($expectedResponse, $response->getContent());
     }
 
-    public function testGetRecord()
+    public function testShow()
     {
-        $client = static::createClient();
-
         $referenceRepository = $this->loadFixtures([RecordFixtures::class])->getReferenceRepository();
 
         $appetiteRecord = $referenceRepository->getReference(RecordFixtures::APPETITE_REFERENCE);
 
-        $client->request('GET', '/api/record/' . $appetiteRecord->getId());
+        $this->client->request('GET', '/api/records/' . $appetiteRecord->getId());
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
 
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -58,14 +63,15 @@ class RecordControllerTest extends WebTestCase
         $this->assertEquals($expectedResponse, $response->getContent());
     }
 
-    public function testGetRecordNotFound()
+    public function testShowNotFound()
     {
-        $client = static::createClient();
-
         $this->loadFixtures([]);
 
-        $client->request('GET', '/api/record/1');
+        $this->client->request('GET', '/api/records/1');
 
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('{"message":"Record not found"}', $response->getContent());
     }
 }

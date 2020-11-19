@@ -11,7 +11,6 @@
         "doctrine/doctrine-bundle": "^2.2",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.7",
-        "friendsofsymfony/rest-bundle": "^3.0",
         "nelmio/api-doc-bundle": "^4.0",
         "phpdocumentor/reflection-docblock": "^5.2",
         "sensio/framework-extra-bundle": "^5.6",

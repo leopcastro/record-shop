@@ -6,20 +6,38 @@ namespace App\Controller;
 
 use App\Entity\Record;
 use App\Repository\RecordRepository;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\Route;
-use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * @Route("/record")
+ * @Route("/records")
  */
-class RecordController extends AbstractFOSRestController
+class RecordController extends AbstractController
 {
     /**
-     * @Rest\Get("")
+     * @var RecordRepository
+     */
+    private RecordRepository $recordRepository;
+
+    /**
+     * @var SerializerInterface
+     */
+    private SerializerInterface $serializer;
+
+    public function __construct(RecordRepository $recordRepository, SerializerInterface $serializer)
+    {
+        $this->recordRepository = $recordRepository;
+        $this->serializer = $serializer;
+    }
+
+    /**
+     * @Route(path="", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="List of Records",
@@ -29,36 +47,55 @@ class RecordController extends AbstractFOSRestController
      *     )
      * )
      *
-     * @param RecordRepository $recordRepository
-     *
-     * @return View
+     * @return JsonResponse
      */
-    public function getRecords(RecordRepository $recordRepository): View
+    public function list(): JsonResponse
     {
-        return $this->view($recordRepository->findAll());
+        $records = $this->recordRepository->findAll();
+
+        return new JsonResponse(
+            $this->serializer->serialize(['records' => $records], 'json'),
+            Response::HTTP_OK,
+            [],
+            true
+        );
     }
 
     /**
-     * @Rest\Get("/{id}")
+     * @Route(path="/{id}", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="Returns a Record",
      *     @OA\JsonContent(ref=@Model(type=Record::class))
      * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     @OA\Schema(type="integer")
+     * )
      *
-     * @param int $id
-     * @param RecordRepository $recordRepository
+     * @param Request $request
      *
-     * @return View
+     * @return JsonResponse
      */
-    public function getRecord(int $id, RecordRepository $recordRepository): View
+    public function show(Request $request): JsonResponse
     {
-        $record = $recordRepository->find($id);
+        $record = $this->recordRepository->find($request->get('id'));
 
         if (!$record) {
-            return $this->view(null, 404);
+            return new JsonResponse(
+                $this->serializer->serialize(['message' => 'Record not found'], 'json'),
+                Response::HTTP_NOT_FOUND,
+                [],
+                true
+            );
         }
 
-        return $this->view($record);
+        return new JsonResponse(
+            $this->serializer->serialize($record, 'json'),
+            Response::HTTP_OK,
+            [],
+            true
+        );
     }
 }
