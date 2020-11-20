@@ -29,4 +29,12 @@ abstract class ApiController extends AbstractController
             true
         );
     }
+
+    protected function getValidationErrorResponse($serializable, int $code): JsonResponse
+    {
+        return $this->getResponse(
+            ['validationErrors' => $serializable],
+            $code
+        );
+    }
 }

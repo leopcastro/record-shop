@@ -121,6 +121,55 @@ class RecordControllerTest extends WebTestCase
         $this->assertEquals('{"message":"Record not found"}', $response->getContent());
     }
 
+    public function testCreate()
+    {
+        $this->loadFixtures([]);
+
+        $record = [
+            'name' => 'Record Name',
+            'artist' => 'Artist Name',
+            'price' => 15.99,
+            'releasedYear' => '1990'
+        ];
+
+        $this->client->request(
+            'POST',
+            '/api/records',
+            $record,
+        );
+
+        $response = $this->client->getResponse();
+
+        $returnedRecord = json_decode($response->getContent());
+
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals(1, $returnedRecord->id);
+
+        foreach ($record as $field => $value) {
+            $this->assertEquals($value, $returnedRecord->$field);
+        }
+    }
+
+    public function testCreateValidation()
+    {
+        $this->loadFixtures([]);
+
+        $this->client->request(
+            'POST',
+            '/api/records',
+            [],
+        );
+
+        $response = $this->client->getResponse();
+
+        $responseContent = json_decode($response->getContent());
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertObjectHasAttribute('validationErrors', $responseContent);
+        // Minimum 3 errors, one for each required parameter
+        $this->assertGreaterThanOrEqual(3, count($responseContent->validationErrors));
+    }
+
     private function getListSerializedResponse(array $records): string
     {
         $recordsList = ['records' => $records];
