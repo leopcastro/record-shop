@@ -4,13 +4,16 @@ DOCKER-COMPOSE-FILE-DEV="docker/docker-compose-dev.yml"
 ###########
 ### RUN ###
 ###########
+up-build-dev: build-dev composer_install up
+
 up:
 	docker-compose -f $(DOCKER-COMPOSE-FILE-DEV) up -d
 
-up-build-dev: build-dev up
-
 down:
 	docker-compose -f $(DOCKER-COMPOSE-FILE-DEV) down
+
+stop:
+	docker-compose -f $(DOCKER-COMPOSE-FILE-DEV) stop
 
 nginx-sh:
 	docker-compose -f $(DOCKER-COMPOSE-FILE-DEV) exec rs-nginx sh
@@ -39,3 +42,19 @@ build-php-fpm-dev:
 	-t private/record-shop/php-fpm-dev:latest
 
 build-dev: build-nginx build-php-fpm-dev
+
+composer_install:
+	docker-compose -f $(DOCKER-COMPOSE-FILE-DEV) run --rm rs-php sh -c "composer install"
+
+
+######################
+### TESTS/ANALYSIS ###
+######################
+tests:
+	docker-compose -f $(DOCKER-COMPOSE-FILE-DEV) run --rm rs-php sh -c "composer tests"
+
+phpcs:
+	docker-compose -f $(DOCKER-COMPOSE-FILE-DEV) run --rm rs-php sh -c "composer phpcs"
+
+phpcbf:
+	docker-compose -f $(DOCKER-COMPOSE-FILE-DEV) run --rm rs-php sh -c "composer phpcbf"

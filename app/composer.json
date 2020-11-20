@@ -64,7 +64,10 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "tests": "bin/phpunit",
+        "phpcs": "vendor/bin/phpcs",
+        "phpcbf": "vendor/bin/phpcbf"
     },
     "conflict": {
         "symfony/symfony": "*"
