@@ -6,21 +6,32 @@ namespace App\Controller;
 
 use App\Repository\HelloRepository;
 use App\Entity\Hello;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\Route;
-use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class HelloController
  * @Route("/hello")
  */
-class HelloController extends AbstractFOSRestController
+class HelloController extends AbstractController
 {
     /**
-     * @Rest\Get("")
+     * @var SerializerInterface
+     */
+    private SerializerInterface $serializer;
+
+    public function __construct(SerializerInterface $serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
+    /**
+     * @Route(path="", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="List of Hello messages",
@@ -32,10 +43,15 @@ class HelloController extends AbstractFOSRestController
      *
      * @param HelloRepository $helloRepository
      *
-     * @return View
+     * @return JsonResponse
      */
-    public function getHello(HelloRepository $helloRepository): View
+    public function getHello(HelloRepository $helloRepository): JsonResponse
     {
-        return $this->view($helloRepository->findAll());
+        return new JsonResponse(
+            $this->serializer->serialize($helloRepository->findAll(), 'json'),
+            Response::HTTP_OK,
+            [],
+            true
+        );
     }
 }
