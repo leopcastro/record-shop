@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class ApiController extends AbstractController
@@ -36,5 +37,10 @@ abstract class ApiController extends AbstractController
             ['validationErrors' => $serializable],
             $code
         );
+    }
+
+    protected function getNotFoundResponse(): JsonResponse
+    {
+        return $this->getResponse(['message' => 'Record not found'], Response::HTTP_NOT_FOUND);
     }
 }
