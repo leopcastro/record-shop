@@ -14,7 +14,7 @@ class RecordParameters implements Validatable
      * @Assert\Type("string")
      * @Assert\Length(max="100")
      */
-    private $name;
+    private $title;
 
     /**
      * @Assert\NotBlank
@@ -43,9 +43,9 @@ class RecordParameters implements Validatable
      */
     private $releasedYear;
 
-    public function __construct($name, $artist, $price, $releasedYear)
+    public function __construct($title, $artist, $price, $releasedYear)
     {
-        $this->name = $name;
+        $this->title = $title;
         $this->artist = $artist;
         $this->price = $price;
         $this->releasedYear = $releasedYear;
@@ -54,9 +54,9 @@ class RecordParameters implements Validatable
     /**
      * @return string
      */
-    public function getName(): string
+    public function getTitle(): string
     {
-        return $this->name;
+        return $this->title;
     }
 
     /**

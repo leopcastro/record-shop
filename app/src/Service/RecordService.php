@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\Record;
 use App\Repository\RecordRepository;
 use App\RequestParameters\Pagination;
+use App\RequestParameters\RecordFilters;
 use App\RequestParameters\RecordParameters;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -33,15 +34,15 @@ class RecordService
         return $this->recordRepository->find($recordId);
     }
 
-    public function getRecords(Pagination $pagination): \ArrayIterator
+    public function getRecords(Pagination $pagination, RecordFilters $recordFilters): \ArrayIterator
     {
-        return $this->recordRepository->findAllPaginated($pagination);
+        return $this->recordRepository->findByCriterion($pagination, $recordFilters);
     }
 
     public function createRecord(RecordParameters $recordParameters): Record
     {
         $newRecord = new Record(
-            $recordParameters->getName(),
+            $recordParameters->getTitle(),
             $recordParameters->getArtist(),
             $recordParameters->getPrice()
         );
@@ -62,7 +63,7 @@ class RecordService
             return null;
         }
 
-        $record->setName($recordParameters->getName());
+        $record->setTitle($recordParameters->getTitle());
         $record->setArtist($recordParameters->getArtist());
         $record->setPrice($recordParameters->getPrice());
         $record->setReleasedYear($recordParameters->getReleasedYear());
