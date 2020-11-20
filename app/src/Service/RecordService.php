@@ -71,4 +71,18 @@ class RecordService
 
         return $record;
     }
+
+    public function deleteRecord(int $recordId): bool
+    {
+        $record = $this->recordRepository->find($recordId);
+
+        if (!$record) {
+            return false;
+        }
+
+        $this->entityManager->remove($record);
+        $this->entityManager->flush();
+
+        return true;
+    }
 }

@@ -227,6 +227,32 @@ class RecordControllerTest extends WebTestCase
         $this->assertGreaterThanOrEqual(3, count($responseContent->validationErrors));
     }
 
+    public function testDelete()
+    {
+        $referenceRepository = $this->loadFixtures([RecordFixtures::class])->getReferenceRepository();
+
+        $appetiteRecord = $referenceRepository->getReference(RecordFixtures::APPETITE_REFERENCE);
+
+        $this->client->request('DELETE', '/api/records/' . $appetiteRecord->getId());
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(204, $response->getStatusCode());
+        $this->assertEmpty($response->getContent());
+    }
+
+    public function testDeleteNotFound()
+    {
+        $this->loadFixtures([]);
+
+        $this->client->request('DELETE', '/api/records/123');
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('{"message":"Record not found"}', $response->getContent());
+    }
+
     private function getListSerializedResponse(array $records): string
     {
         $recordsList = ['records' => $records];

@@ -134,6 +134,7 @@ class RecordController extends ApiController
      * @OA\Parameter(
      *     name="id",
      *     in="path",
+     *     description="Record id to return",
      *     @OA\Schema(type="integer")
      * )
      * @OA\Response(
@@ -268,6 +269,7 @@ class RecordController extends ApiController
      * @OA\Parameter(
      *     name="id",
      *     in="path",
+     *     description="Record id to update",
      *     @OA\Schema(type="integer")
      * )
      * @OA\RequestBody(
@@ -374,6 +376,47 @@ class RecordController extends ApiController
         }
 
         return $this->getResponse($updatedRecord, 200);
+    }
+
+    /**
+     * @Route(path="/{id}", methods={"DELETE"})
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="Record id to delete",
+     *     @OA\Schema(type="integer")
+     * )
+     * @OA\Response(
+     *     response=204,
+     *     description="Record deleted"
+     * ),
+     * @OA\Response(
+     *     response=404,
+     *     description="Not found",
+     *     @OA\MediaType(
+     *          mediaType="application/json",
+     *          @OA\Schema(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *     )
+     * )
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function delete(Request $request)
+    {
+        $record = $this->recordService->deleteRecord((int) $request->get('id'));
+
+        if (!$record) {
+            return $this->getNotFoundResponse();
+        }
+
+        return $this->getResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
