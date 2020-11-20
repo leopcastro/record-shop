@@ -1,0 +1,3 @@
+CREATE DATABASE `record-shop` /*!40100 DEFAULT CHARACTER SET latin1 */;
+
+CREATE DATABASE `record-shop-test` /*!40100 DEFAULT CHARACTER SET latin1 */;
