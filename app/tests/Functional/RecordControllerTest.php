@@ -125,12 +125,7 @@ class RecordControllerTest extends WebTestCase
     {
         $this->loadFixtures([]);
 
-        $record = [
-            'name' => 'Record Name',
-            'artist' => 'Artist Name',
-            'price' => 15.99,
-            'releasedYear' => '1990'
-        ];
+        $record = $this->getValidRecordAsArray();
 
         $this->client->request(
             'POST',
@@ -170,10 +165,85 @@ class RecordControllerTest extends WebTestCase
         $this->assertGreaterThanOrEqual(3, count($responseContent->validationErrors));
     }
 
+    public function testUpdate()
+    {
+        $referenceRepository = $this->loadFixtures([RecordFixtures::class])->getReferenceRepository();
+
+        /** @var Record $appetiteRecordBeforeUpdate */
+        $appetiteRecordBeforeUpdate = $referenceRepository->getReference(RecordFixtures::APPETITE_REFERENCE);
+
+        $record = $this->getValidRecordAsArray();
+
+        $this->client->request(
+            'PUT',
+            '/api/records/' . $appetiteRecordBeforeUpdate->getId(),
+            $record,
+        );
+
+        $response = $this->client->getResponse();
+
+        $returnedRecord = json_decode($response->getContent());
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(1, $returnedRecord->id);
+
+        foreach ($record as $field => $value) {
+            $this->assertEquals($value, $returnedRecord->$field);
+        }
+    }
+
+    public function testUpdateNotFound()
+    {
+        $this->loadFixtures([]);
+
+        $this->client->request(
+            'PUT',
+            '/api/records/123',
+            $this->getValidRecordAsArray(),
+        );
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('{"message":"Record not found"}', $response->getContent());
+    }
+
+    public function testUpdateValidation()
+    {
+        $this->loadFixtures([]);
+
+        $this->client->request(
+            'PUT',
+            '/api/records/123',
+            [],
+        );
+
+        $response = $this->client->getResponse();
+        $responseContent = json_decode($response->getContent());
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertObjectHasAttribute('validationErrors', $responseContent);
+        // Minimum 3 errors, one for each required parameter
+        $this->assertGreaterThanOrEqual(3, count($responseContent->validationErrors));
+    }
+
     private function getListSerializedResponse(array $records): string
     {
         $recordsList = ['records' => $records];
 
         return $this->serializer->serialize($recordsList, 'json');
+    }
+
+    /**
+     * @return array
+     */
+    private function getValidRecordAsArray(): array
+    {
+        return [
+            'name' => 'Record Name',
+            'artist' => 'Artist Name',
+            'price' => 15.99,
+            'releasedYear' => '1990'
+        ];
     }
 }

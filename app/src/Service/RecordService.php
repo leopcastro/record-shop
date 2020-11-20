@@ -53,4 +53,22 @@ class RecordService
 
         return $newRecord;
     }
+
+    public function updateRecord(int $recordId, RecordParameters $recordParameters): ?Record
+    {
+        $record = $this->recordRepository->find($recordId);
+
+        if (!$record) {
+            return null;
+        }
+
+        $record->setName($recordParameters->getName());
+        $record->setArtist($recordParameters->getArtist());
+        $record->setPrice($recordParameters->getPrice());
+        $record->setReleasedYear($recordParameters->getReleasedYear());
+
+        $this->entityManager->flush();
+
+        return $record;
+    }
 }
