@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Record;
 use App\Repository\RecordRepository;
 use App\RequestParameters\Pagination;
+use App\RequestParameters\RecordFilters;
 use App\RequestParameters\RecordParameters;
 use App\RequestParameters\Validatable;
 use App\Service\RecordService;
@@ -56,6 +57,18 @@ class RecordController extends ApiController
      * @Route(path="", methods={"GET"})
      *
      * @OA\Parameter(
+     *     name="title",
+     *     in="query",
+     *     @OA\Schema(type="string", maxLength=100),
+     *     description="Title of the record to search"
+     * )
+     * @OA\Parameter(
+     *     name="artist",
+     *     in="query",
+     *     @OA\Schema(type="string", maxLength=100),
+     *     description="Artist of the record to search"
+     * )
+     * * @OA\Parameter(
      *     name="offset",
      *     in="query",
      *     @OA\Schema(type="integer", minimum="0"),
@@ -70,7 +83,7 @@ class RecordController extends ApiController
      *
      * @OA\Response(
      *     response=200,
-     *     description="List of Records",
+     *     description="List of Records ordered by Artist and Title",
      *     @OA\MediaType(
      *           mediaType="application/json",
      *           @OA\Schema(
@@ -83,7 +96,6 @@ class RecordController extends ApiController
      *           )
      *       )
      * )
-     *
      * @OA\Response(
      *     response="400",
      *     description="Validation Error",
@@ -117,26 +129,30 @@ class RecordController extends ApiController
     public function list(Request $request): JsonResponse
     {
         $pagination = new Pagination($request->get('offset'), $request->get('limit'));
+        $violations = $this->validateParameters($pagination);
 
-        $validationErrors = $this->validateParameters($pagination);
+        $filter = new RecordFilters($request->get('title'), $request->get('artist'));
+        $violations = array_merge($violations, $this->validateParameters($filter));
 
-        if ($validationErrors) {
-            return $this->getValidationErrorResponse($validationErrors, Response::HTTP_BAD_REQUEST);
+        if ($violations) {
+            return $this->getValidationErrorResponse($violations, Response::HTTP_BAD_REQUEST);
         }
 
-        $records = $this->recordService->getRecords($pagination);
+        $records = $this->recordService->getRecords($pagination, $filter);
 
         return $this->getResponse(['records' => $records], Response::HTTP_OK);
     }
 
     /**
      * @Route(path="/{id}", methods={"GET"})
+     *
      * @OA\Parameter(
      *     name="id",
      *     in="path",
      *     description="Record id to return",
      *     @OA\Schema(type="integer")
      * )
+     *
      * @OA\Response(
      *     response=200,
      *     description="Returns a Record",
@@ -174,15 +190,16 @@ class RecordController extends ApiController
 
     /**
      * @Route(path="", methods={"POST"})
+     *
      * @OA\RequestBody(
      *     description="Fields avaialble to create a Record",
      *     required=true,
      *     @OA\MediaType(
      *          mediaType="application/x-www-form-urlencoded",
      *          @OA\Schema(
-     *              required={"name", "artist", "price"},
+     *              required={"title", "artist", "price"},
      *              @OA\Property(
-     *                  property="name",
+     *                  property="title",
      *                  type="string",
      *                  maxLength=100
      *              ),
@@ -208,6 +225,7 @@ class RecordController extends ApiController
      *          )
      *     )
      * )
+     *
      * @OA\Response(
      *     response=201,
      *     description="Creates a Record and returns it.",
@@ -239,7 +257,6 @@ class RecordController extends ApiController
      *     )
      * )
      *
-     *
      * @param Request $request
      *
      * @return JsonResponse
@@ -247,7 +264,7 @@ class RecordController extends ApiController
     public function create(Request $request): JsonResponse
     {
         $recordParameters = new RecordParameters(
-            $request->get('name'),
+            $request->get('title'),
             $request->get('artist'),
             $request->get('price'),
             $request->get('releasedYear')
@@ -266,21 +283,23 @@ class RecordController extends ApiController
 
     /**
      * @Route(path="/{id}", methods={"PUT"})
+     *
      * @OA\Parameter(
      *     name="id",
      *     in="path",
      *     description="Record id to update",
      *     @OA\Schema(type="integer")
      * )
+     *
      * @OA\RequestBody(
      *     description="Fields avaialble to create a Record",
      *     required=true,
      *     @OA\MediaType(
      *          mediaType="application/x-www-form-urlencoded",
      *          @OA\Schema(
-     *              required={"name", "artist", "price"},
+     *              required={"title", "artist", "price"},
      *              @OA\Property(
-     *                  property="name",
+     *                  property="title",
      *                  type="string",
      *                  maxLength=100
      *              ),
@@ -306,6 +325,7 @@ class RecordController extends ApiController
      *          )
      *     )
      * )
+     *
      * @OA\Response(
      *     response=200,
      *     description="Returns the updated Record",
@@ -350,6 +370,7 @@ class RecordController extends ApiController
      *          )
      *     )
      * )
+     *
      * @param Request $request
      *
      * @return JsonResponse
@@ -357,7 +378,7 @@ class RecordController extends ApiController
     public function update(Request $request): JsonResponse
     {
         $recordParameters = new RecordParameters(
-            $request->get('name'),
+            $request->get('title'),
             $request->get('artist'),
             $request->get('price'),
             $request->get('releasedYear')
@@ -380,12 +401,14 @@ class RecordController extends ApiController
 
     /**
      * @Route(path="/{id}", methods={"DELETE"})
+     *
      * @OA\Parameter(
      *     name="id",
      *     in="path",
      *     description="Record id to delete",
      *     @OA\Schema(type="integer")
      * )
+     *
      * @OA\Response(
      *     response=204,
      *     description="Record deleted"
@@ -404,6 +427,7 @@ class RecordController extends ApiController
      *          )
      *     )
      * )
+     *
      * @param Request $request
      *
      * @return JsonResponse

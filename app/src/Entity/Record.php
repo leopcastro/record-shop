@@ -23,7 +23,7 @@ class Record
     /**
      * @ORM\Column(type="string", length=100)
      */
-    private string $name;
+    private string $title;
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -40,9 +40,9 @@ class Record
      */
     private ?int $releasedYear;
 
-    public function __construct(string $name, string $artist, float $price)
+    public function __construct(string $title, string $artist, float $price)
     {
-        $this->name = $name;
+        $this->title = $title;
         $this->artist = $artist;
         $this->price = $price;
     }
@@ -58,17 +58,17 @@ class Record
     /**
      * @return string
      */
-    public function getName(): string
+    public function getTitle(): string
     {
-        return $this->name;
+        return $this->title;
     }
 
     /**
-     * @param string $name
+     * @param string $title
      */
-    public function setName(string $name): void
+    public function setTitle(string $title): void
     {
-        $this->name = $name;
+        $this->title = $title;
     }
 
     /**

@@ -25,7 +25,7 @@ class RecordControllerTest extends WebTestCase
         $this->serializer = $serializer = self::$container->get('serializer');
     }
 
-    public function testListNoParameter()
+    public function testListNoParameterAndOrdering()
     {
         $referenceRepository = $this->loadFixtures([RecordFixtures::class])->getReferenceRepository();
 
@@ -37,6 +37,7 @@ class RecordControllerTest extends WebTestCase
 
         $expectedRecords = [
             $referenceRepository->getReference(RecordFixtures::APPETITE_REFERENCE),
+            $referenceRepository->getReference(RecordFixtures::ILLUSION_REFERENCE),
             $referenceRepository->getReference(RecordFixtures::DARK_SIDE_NO_RELEASE_REFERENCE)
         ];
 
@@ -74,8 +75,53 @@ class RecordControllerTest extends WebTestCase
     {
         return [
             ['limit=1', RecordFixtures::APPETITE_REFERENCE],
-            ['limit=1&offset=1', RecordFixtures::DARK_SIDE_NO_RELEASE_REFERENCE]
+            ['limit=1&offset=2', RecordFixtures::DARK_SIDE_NO_RELEASE_REFERENCE]
         ];
+    }
+
+    /**
+     * @dataProvider listFilteredDataProvider
+     *
+     * @param string $recordReference
+     * @param string $urlFilter
+     * @param int $expectedQty
+     */
+    public function testListFiltered(string $recordReference, string $urlFilter, int $expectedQty)
+    {
+        $referenceRepository = $this->loadFixtures([RecordFixtures::class])->getReferenceRepository();
+        $expectedRecord = $referenceRepository->getReference($recordReference);
+
+        $this->client->request('GET', '/api/records?' . $urlFilter);
+
+        $response = $this->client->getResponse();
+        $responseContent = json_decode($response->getContent());
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertCount($expectedQty, $responseContent->records);
+        $this->assertEquals($expectedRecord->getTitle(), $responseContent->records[0]->title);
+    }
+
+    public function listFilteredDataProvider()
+    {
+        return[
+            [RecordFixtures::APPETITE_REFERENCE, 'title=appetite', 1],
+            [RecordFixtures::DARK_SIDE_NO_RELEASE_REFERENCE, 'artist=floyd', 1],
+            [RecordFixtures::APPETITE_REFERENCE, 'artist=roses', 2],
+            [RecordFixtures::ILLUSION_REFERENCE, 'title=use%20your&artist=roses', 1]
+        ];
+    }
+
+    public function testListFilteredNoResult()
+    {
+        $this->loadFixtures();
+
+        $this->client->request('GET', '/api/records?title=not_existent');
+
+        $response = $this->client->getResponse();
+        $responseContent = json_decode($response->getContent());
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertCount(0, $responseContent->records);
     }
 
     public function testListPaginationValidationReturnsError()
@@ -111,7 +157,7 @@ class RecordControllerTest extends WebTestCase
 
     public function testShowNotFound()
     {
-        $this->loadFixtures([]);
+        $this->loadFixtures();
 
         $this->client->request('GET', '/api/records/1');
 
@@ -123,7 +169,7 @@ class RecordControllerTest extends WebTestCase
 
     public function testCreate()
     {
-        $this->loadFixtures([]);
+        $this->loadFixtures();
 
         $record = $this->getValidRecordAsArray();
 
@@ -147,7 +193,7 @@ class RecordControllerTest extends WebTestCase
 
     public function testCreateValidation()
     {
-        $this->loadFixtures([]);
+        $this->loadFixtures();
 
         $this->client->request(
             'POST',
@@ -194,7 +240,7 @@ class RecordControllerTest extends WebTestCase
 
     public function testUpdateNotFound()
     {
-        $this->loadFixtures([]);
+        $this->loadFixtures();
 
         $this->client->request(
             'PUT',
@@ -210,7 +256,7 @@ class RecordControllerTest extends WebTestCase
 
     public function testUpdateValidation()
     {
-        $this->loadFixtures([]);
+        $this->loadFixtures();
 
         $this->client->request(
             'PUT',
@@ -243,7 +289,7 @@ class RecordControllerTest extends WebTestCase
 
     public function testDeleteNotFound()
     {
-        $this->loadFixtures([]);
+        $this->loadFixtures();
 
         $this->client->request('DELETE', '/api/records/123');
 
@@ -266,7 +312,7 @@ class RecordControllerTest extends WebTestCase
     private function getValidRecordAsArray(): array
     {
         return [
-            'name' => 'Record Name',
+            'title' => 'Record Title',
             'artist' => 'Artist Name',
             'price' => 15.99,
             'releasedYear' => '1990'
