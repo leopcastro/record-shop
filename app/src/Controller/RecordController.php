@@ -26,11 +26,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class RecordController extends ApiController
 {
     /**
-     * @var RecordRepository
-     */
-    private RecordRepository $recordRepository;
-
-    /**
      * @var ValidatorInterface
      */
     private ValidatorInterface $validator;
@@ -41,14 +36,12 @@ class RecordController extends ApiController
     private RecordService $recordService;
 
     public function __construct(
-        RecordRepository $recordRepository,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
         RecordService $recordService
     ) {
         parent::__construct($serializer);
 
-        $this->recordRepository = $recordRepository;
         $this->validator = $validator;
         $this->recordService = $recordService;
     }
