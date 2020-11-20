@@ -23,6 +23,10 @@ Requirements:
 
  - `Xdebug` is running on port 9001 (additional config in docker/php-fpm/dev.xdebug.ini)
 
+ - All that is set for the infrastructure was only configured to enable a `development environment`. In no way this is 
+ supposed to be used in production/public facing environments. One of the examples of bad practices is the hard coding 
+ of passwords in the source code (env files and docker-compose).
+
 ## Application
  - Symfony 5.1
  
@@ -34,7 +38,24 @@ Requirements:
 
  - OpenApi documentation generated through Annotations (NelmioApiDocBundle)
 
+The application is using a workflow of Controller -> Service -> Repository.
 
+DTOs were created (RequestParameters) to map the request parameters. Since the parameters from the request come by 
+default as strings, type hinting was omitted in some cases to allow the use of the DTO to validate the data through 
+other ways.
+
+The Service was introduced to decouple the Repository and entity manipulation from the Controller.
+
+This is an initial architecture/version, but there are already some points that could be improved for the future:
+ - Creating a DTO for the response to decouple the Entity from it, giving more freedom of choice regarding its format.
+ - Refactor the repository to not extend anymore from ServiceEntityRepository, but to have the entity manager injected 
+ on it, along with introducing an interface.
+ - Using a real money/currency representation for the price
+ - Normalizing the database by splitting the artist in its own table
+ - Possibly extracting the validation from the controller to a service
+ - Improving the way the annotations for OpenApi are defined by finding ways of reusing schemas from other files, like 
+ the DTOs for example.
+ - Add unit tests to cover some parts of the code.
 
 ## OpenAPI Documentation
  - UI: http://localhost:8080/api/doc
@@ -49,11 +70,13 @@ Requirements:
 ## Running the application
 GNU `make` is being used for shortcuts of Docker and Docker Compose commands.
 
-For starting the application in the first time run the following:
+When starting the application for the first time, run the following command:
 
 `make up-build-dev`
 
-This is a list of some additional commands, more can be found in the `Makefile` 
+It should build the containers, do a composer install and start the containers. 
+
+This is a list of some additional useful commands, more can be found in the `Makefile` 
  - `up` for just starting the containers
  - `down` for applying compose down command
  - `php-sh` to access the PHP container
