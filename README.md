@@ -17,7 +17,9 @@ Requirements:
 
  - `REST Api` is running at http://localhost:8080/api
 
- - `MySQL` 5.7 is running at localhost:3310 with user and password `root`
+ - `MySQL` 5.7 is running at localhost:3310 
+    - username and password are `root`
+    - databases `record-shop` and `record-shop-test `
 
  - `Xdebug` is running on port 9001 (additional config in docker/php-fpm/dev.xdebug.ini)
 
