@@ -11,7 +11,7 @@ class Pagination implements Validatable
     /**
      * @Assert\Regex(
      *     pattern="/^\d+$/",
-     *     message="It needs to be an integer"
+     *     message="This values should be an integer"
      * )
      * @Assert\Positive
      */
@@ -20,7 +20,7 @@ class Pagination implements Validatable
     /**
      * @Assert\Regex(
      *     pattern="/^\d+$/",
-     *     message="It needs to be an integer"
+     *     message="This values should be an integer"
      * )
      * @Assert\LessThanOrEqual(100)
      * @Assert\Positive

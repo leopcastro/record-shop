@@ -31,7 +31,7 @@ class Record
     private string $artist;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="decimal", precision=8, scale=2)
      */
     private float $price;
 
